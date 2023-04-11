@@ -1,0 +1,48 @@
+package javap;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+/*Sort the word
+*/
+public class javap  {
+	public static String reverse(String str) {
+        char[] chars = str.toCharArray();
+        int left = 0;
+        int right = chars.length - 1;
+        while (left < right) {
+            char temp = chars[left];
+            chars[left] = chars[right];
+            chars[right] = temp;
+            left++;
+            right--;
+        }
+        return new String(chars);
+    }
+	   public static void main(String args[]) {
+		   String str = "hello world my india";
+		   char[] chars = str.toCharArray();
+		   Arrays.sort(chars);
+		   String sortedStr = new String(chars);
+		   System.out.println(sortedStr);
+		   System.out.println(reverse(sortedStr));
+		   //Sorting using Stream-----------
+		  // List<String> list = Arrays.asList("apple", "banana", "cherry", "date");
+		   String[] words = str.split(" ");
+		   List<String> list = Arrays.asList(words);
+		   List<String> sortedList = list.stream()
+		           .sorted(Comparator.reverseOrder())
+		           .collect(Collectors.toList());
+		   System.out.println(sortedList);
+		   list.stream().sorted().forEach((n)->System.out.print(n+","));
+
+		
+	}
+		
+	}
+/*     addehiilllmnoorwy
+ywroonmllliihedda   
+[world, my, india, hello]
+hello,india,my,world,
+ */
