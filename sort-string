@@ -1,0 +1,41 @@
+// Sort String
+  package javap; 
+  import java.util.*;
+  public class javap
+  {
+      
+      public static char[] sortChar(char[] ch){
+              for(int i=0;i<ch.length-1;i++){
+     for(int j=i+1;j<ch.length;j++){
+     if(ch[i]>ch[j]){
+         char temp=ch[j];
+         ch[j]=ch[i];
+         ch[i]=temp;
+      }
+     }
+    
+  }
+          return ch;
+      }
+  public static void main(String[] args) {
+  // System.out.println("Hello World");
+  String str="praveen kumar yadav";
+  String str2[]=str.split(" ");
+  StringBuilder app=new StringBuilder();
+  //int arr[]={1,2,4};
+  int len=str2.length;
+  for(int k=0;k<len;k++){
+    char ch[]=str2[k].toCharArray(); 
+    app.append(sortChar(ch));
+    app.append(" ");
+              //ch[]='';
+  }
+  //Character ch[]=new Character(str);
+  // char ch[]=str.toCharArray();
+
+
+      System.out.println(app);
+  }
+  }
+//output:
+  //aeenprv akmru aadvy 
