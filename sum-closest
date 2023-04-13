@@ -1,0 +1,39 @@
+// find the two numbers in an array that have the sum closest to a given target number, you can use the following algorithm in Java:
+  package javap; 
+  import java.util.*;;
+
+  public class javap {
+	  public static int[] findSumClosestToTarget(int[] nums, int target) {
+		    int left = 0, right = nums.length - 1;
+		    int[] result = new int[2];
+		    int minDiff = Integer.MAX_VALUE;
+		    while (left < right) {
+		        int sum = nums[left] + nums[right];
+		        int diff = Math.abs(sum - target);
+		        if (diff < minDiff) {
+		            minDiff = diff;
+		            result[0] = nums[left];
+		            result[1] = nums[right];
+		        }
+		        if (sum < target) {
+		            left++;
+		        } else {
+		            right--;
+		        }
+		    }
+		    return result;
+		}
+
+  	public static void main(String[] args) {
+  		int[] nums = {1, 3, 5, 7, 9};
+  		int target = 12;
+  		int[] result = findSumClosestToTarget(nums, target);
+  		System.out.println(Arrays.toString(result)); // output: [3, 9]
+
+  	}
+  }
+
+/*[3, 9]
+  */
+
+ 
