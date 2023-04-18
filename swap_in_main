@@ -1,0 +1,18 @@
+// two variable in main method change value using function
+public class MyClass {
+   public static void main(String[] args) {
+        int a = 5;
+        int b = 10;
+        int[] result = swapNumbers(a, b);
+        System.out.println("a = " + result[0] + ", b = " + result[1]);
+    }
+    
+    public static int[] swapNumbers(int x, int y) {
+        int temp = x;
+        x = y;
+        y = temp;
+        int[] swapped = {x, y};
+        return swapped;
+    }
+}
+//output- a = 10, b = 5
