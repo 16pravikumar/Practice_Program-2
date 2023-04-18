@@ -1,0 +1,18 @@
+// Sort String based on length
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.Comparator;
+public class MyClass {
+   public static void main(String[] args) {
+     String str1[]= {"I","Love","you"};
+     String s=Arrays.stream(str1).sorted(Comparator.comparingInt(String::length)).collect(Collectors.joining(" "));
+     System.out.println(s);  
+    }
+  
+   
+}
+
+
+/*output-I you Love
+*/
