@@ -1,0 +1,41 @@
+import java.util.*;
+import java.util.function.Function;
+import java.util.Map;
+import java.util.stream.Collectors;
+public class MyClass {
+    public static void main(String args[]) {
+      String str="my nme is is pravi pravi";
+      String res[]=str.split(" ");
+       //Count Words
+       char[] re=str.toCharArray();
+      Map<String, Long> wordCounts = Arrays.stream(res)
+                                             .collect(Collectors.groupingBy(word -> word, Collectors.counting()));
+        System.out.println(wordCounts);
+         //Count the character
+        Map<Character, Long> charCountMap = str.chars()
+    .mapToObj(c -> (char) c)
+    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+         System.out.println(charCountMap);
+         //Count Words
+        HashMap<String, Integer> map=new HashMap<>();
+   for(int i=0;i<res.length;i++){
+       if(map.containsKey(res[i])){
+           int c= map.get(res[i]);
+       map.put(res[i],++c);
+       }
+       else
+        map.put(res[i],1);
+   }System.out.println(map);
+   for(String s:map.keySet())
+      System.out.println(s+map.get(s));
+    }
+}
+/*output
+{nme=1, is=2, my=1, pravi=2}
+{p=2,  =5, a=2, r=2, s=2, e=1, v=2, i=4, y=1, m=2, n=1}
+{nme=1, is=2, my=1, pravi=2}
+nme1
+is2
+my1
+pravi2
+*/
