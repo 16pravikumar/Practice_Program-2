@@ -1,0 +1,42 @@
+import java.util.ArrayList;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+public class MyClass {
+    public String name;
+    public int salary;
+    public int Age;
+    MyClass(String nm,int Age,int s){
+        this.name=nm;
+        this.salary=s;
+        this.Age=Age;
+    }
+    public static void main(String args[]) {
+        // sort employee by salary in ascending order
+        List < MyClass > employees = new ArrayList < MyClass > ();
+        employees.add(new MyClass("Ramesh",23,400));
+        employees.add(new MyClass("John",27,350));
+        employees.add(new MyClass("Tom",45,450));
+        employees.add(new MyClass("Pramod",56,500));
+        //Based on Age
+     List < MyClass > employeesSortedList1 = employees.stream()
+            .sorted((o1, o2) -> (int)(o2.Age - o1.Age)).collect(Collectors.toList());
+            for(MyClass e:employeesSortedList1)
+        System.out.println(e.name);
+ //Based on Salary
+     List < MyClass > employeesSortedList2 = employees.stream()
+            .sorted((o1, o2) -> (int)(o2.salary - o1.salary)).filter(n->n.salary>=400).collect(Collectors.toList());
+            for(MyClass e1:employeesSortedList2)
+        System.out.println(e1.salary);
+    }
+}
+/*
+    Pramod
+Tom
+John
+Ramesh
+500
+450
+400
+*/
