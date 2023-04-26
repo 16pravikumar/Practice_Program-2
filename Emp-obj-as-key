@@ -1,0 +1,66 @@
+//Main.java
+package javap;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+	public static void main(String[] args) {
+		HashMap<Student,String> map=new HashMap<>();
+		map.put(new Student(101,"praveen"),"Emp1");
+		map.put(new Student(102,"Bhanu"),"Emp2");
+		map.put(new Student(102,"Bhanu"),"Emp2");
+		for(Map.Entry<Student,String> entry:map.entrySet()) {
+		System.out.println(entry.getKey()+"val="+entry.getValue());
+		}
+
+	}
+
+}
+-----------------------------
+//Student.java
+package javap;
+import java.util.Objects;
+
+public class Student {
+	private int Id;
+	private String name;
+	public int getId() {
+		return Id;
+	}
+	public Student(int id, String name) {
+		super();
+		Id = id;
+		this.name = name;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setId(int id) {
+		Id = id;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	@Override
+	public String toString() {
+		return "Student [Id=" + Id + ", name=" + name + "]";
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(Id);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Student other = (Student) obj;
+		return Id == other.Id;
+	}
+}
+//Student [Id=101, name=praveen]val=Emp1
+Student [Id=102, name=Bhanu]val=Emp2
