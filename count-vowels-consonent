@@ -1,0 +1,122 @@
+package javap;
+
+public class Main {
+ 
+    // global variables
+    private static int VOWELS = 0;
+    private static int CONSONANTS = 0;
+    // global variables
+    private static long VOWEL = 0;
+    private static long CONSONANT = 0;
+ 
+    // main() method
+    public static void main(String[] args) {
+ 
+        // test string
+        String str = "BenchResourcesNet has very useful examples and tips on Java";
+ 
+ 
+        // print to console - original String
+        System.out.println("Input String :- \n" + str);
+ 
+ 
+        // call method
+        
+        countVowelsAndConsonants_byStream(str);
+     // print to console
+        System.out.println("\nVowel count is = " + VOWEL);
+        System.out.println("Consonant count is = " + CONSONANT);
+        countVowelsAndConsonants(str);
+        // print to console
+        System.out.println("\nVowel count is = " + VOWELS);
+        System.out.println("Consonant count is = " + CONSONANTS);
+    }
+ 
+ 
+    /**
+     * this method is used to count vowels & consonants
+     * 
+     * @param str
+     */
+    public static void countVowelsAndConsonants_byStream(String str) {
+    	 
+        // check whether input string is not null
+        if(null == str) {
+            throw new IllegalArgumentException("Input String cannot be null");
+        }
+ 
+ 
+        // replace all spaces - ignore space characters
+        str = str.replaceAll(" ", "");
+ 
+ 
+        // count vowels
+        VOWEL = str // original source or string
+                .chars() // get character stream
+                .filter(ch -> (
+                        'a' == ch || 'e' == ch || 'i' == ch || 'o' == ch || 'u' == ch || 
+                        'A' == ch || 'E' == ch || 'I' == ch || 'O' == ch || 'U' == ch)
+                        ) // filter out vowels
+                .count(); // count vowels
+ 
+ 
+        // count consonants
+        CONSONANT = str // original source or string
+                .chars() // get character stream
+                .filter(ch -> (
+                        ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+                        ) // check whether it is in range
+                .filter(ch -> (
+                        'a' != ch && 'e' != ch && 'i' != ch && 'o' != ch && 'u' != ch && 
+                        'A' != ch && 'E' != ch && 'I' != ch && 'O' != ch && 'U' != ch)
+                        ) // filter out non-vowels
+                .count(); // count consonants
+    }
+    public static void countVowelsAndConsonants(String str) {
+ 
+        // check whether input string is not null
+        if(null == str) {
+            throw new IllegalArgumentException("Input String cannot be null");
+        }
+ 
+ 
+        // replace all spaces - ignore space characters
+        str = str.replaceAll(" ", "");
+ 
+ 
+        // iterate String characters and count vowels & consonants
+        for(int index = 0; index < str.length(); index++) {
+ 
+            // read one character at a time
+            char ch = str.charAt(index);
+ 
+            // check for vowels
+            if('a' == ch || 'e' == ch || 'i' == ch || 'o' == ch || 'u' == ch
+                    || 'A' == ch || 'E' == ch || 'I' == ch || 'O' == ch || 'U' == ch) {
+ 
+                // increment vowel count by 1
+                VOWELS++;
+            }
+            else if((ch >= 'a' && ch <= 'z') ||
+                    (ch >= 'A' && ch <= 'Z')) { // check for consonants
+ 
+                // increment consonant count by 1
+                CONSONANTS++;
+            }
+            else {
+                System.out.println("\n" + ch + " isn't Vowel or Consonant");
+            }
+        }
+    }
+}
+/*
+  Input String :- 
+BenchResourcesNet has very useful examples and tips on Java
+
+Vowel count is = 19
+Consonant count is = 32
+
+Vowel count is = 19
+Consonant count is = 32
+
+*/
