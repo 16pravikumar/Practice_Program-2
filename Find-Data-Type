@@ -1,0 +1,35 @@
+import java.util.*;
+public class MyClass {
+    public static void main(String[] args) {
+        countTypesInString();
+    }
+
+    public static void countTypesInString() {
+        String str = "Hello my 50 name 4.5 is James, I 20 years old and i have 5.7 coins";
+        String[] vetStr = str.split("\\s+");
+
+        List<Integer> listInt = new ArrayList<>();
+        List<Float> listFloat = new ArrayList<>();
+        List<String> listStr = new ArrayList<>();
+        for (String s : vetStr) {
+            try {
+                listInt.add(Integer.parseInt(s));
+            } catch (NumberFormatException exInt) {
+                try {
+                    listFloat.add(Float.parseFloat(s));
+                } catch (NumberFormatException exFloat) {
+                    listStr.add(s);
+                }
+            }
+        }
+
+        System.out.println("Number of ints: " + listInt.size() + " => " + listInt);
+        System.out.println("Number of floats: " + listFloat.size() + " => " + listFloat);
+        System.out.println("Number of strings: " + listStr.size() + " => " + listStr);
+    }
+}
+/*
+    Number of ints: 2 => [50, 20]
+Number of floats: 2 => [4.5, 5.7]
+Number of strings: 12 => [Hello, my, name, is, James,, I, years, old, and, i, have, coins]
+*/
