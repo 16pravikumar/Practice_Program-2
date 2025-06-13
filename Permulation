@@ -1,0 +1,20 @@
+package com.hibernatejpacrudrepo.demo.controller;
+
+public class Permulation {
+    public static void main(String[] args){
+        String str="abc";
+        permutation("",str);
+    }
+
+    private static void permutation(String prefix, String str) {
+        if(str.length()<=0){
+            System.out.println(prefix);
+            return;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            char c=str.charAt(i);
+            String temp=str.substring(0,i)+str.substring(i+1);
+            permutation(prefix+c,temp);
+        }
+    }
+}
