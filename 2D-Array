@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 public class PdfService {
 
     public ByteArrayInputStream generateWaybillPdf() {
-        Document document = new Document(PageSize.A4, 20, 20, 20, 20);
+        Document document = new Document(PageSize.A4, 20, 20, 2vv0, 20);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
