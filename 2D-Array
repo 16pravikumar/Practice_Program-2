@@ -1,180 +1,178 @@
+package com.example.demo.service;
+
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import org.springframework.stereotype.Service;
 
-import java.awt.Color;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 @Service
 public class PdfService {
 
-    public ByteArrayInputStream generateWaybillPdf() {
-        Document document = new Document(PageSize.A4, 20, 20, 2vv0, 20);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public byte[] generateWaybillPdf() throws Exception {
+        Document document = new Document(PageSize.A4, 36, 36, 54, 54);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, out);
-            document.open();
+        PdfWriter writer = PdfWriter.getInstance(document, baos);
+        document.open();
 
-            // ===== HEADER =====
-            PdfPTable headerTable = new PdfPTable(3);
-            headerTable.setWidthPercentage(100);
-            headerTable.setWidths(new float[]{40, 30, 30});
+        // ========= HEADER =========
+        Font headerFont = new Font(Font.HELVETICA, 14, Font.BOLD, Color.BLACK);
+        Paragraph header = new Paragraph("Safexpress Logistics Pvt. Ltd.", headerFont);
+        header.setAlignment(Element.ALIGN_CENTER);
+        document.add(header);
 
-            Font headFont = new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
+        Paragraph subHeader = new Paragraph("DELIVERED - Digital Waybill", new Font(Font.HELVETICA, 12, Font.BOLD, Color.GREEN));
+        subHeader.setAlignment(Element.ALIGN_CENTER);
+        document.add(subHeader);
+        document.add(new Paragraph(" "));
 
-            PdfPCell left = new PdfPCell(new Phrase("Digital Waybill", new Font(Font.HELVETICA, 14, Font.BOLD)));
-            left.setBorder(Rectangle.NO_BORDER);
-            left.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            headerTable.addCell(left);
+        // ========= WAYBILL + BOOKING TABLE =========
+        PdfPTable infoTable = new PdfPTable(2);
+        infoTable.setWidthPercentage(100);
+        infoTable.setWidths(new float[]{50, 50});
 
-            PdfPCell delivered = new PdfPCell(new Phrase("DELIVERED", new Font(Font.HELVETICA, 16, Font.BOLD, Color.GREEN)));
-            delivered.setBorder(Rectangle.NO_BORDER);
-            delivered.setHorizontalAlignment(Element.ALIGN_CENTER);
-            headerTable.addCell(delivered);
+        addCell(infoTable, "Waybill No.: 100018242559");
+        addCell(infoTable, "Booking Branch: DELHI-15");
 
-            PdfPCell logo = new PdfPCell(new Phrase("SAFEXPRESS\nDistribution Redefined", headFont));
-            logo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            logo.setBorder(Rectangle.NO_BORDER);
-            headerTable.addCell(logo);
+        addCell(infoTable, "Pickup Date: 11-JUN-2025");
+        addCell(infoTable, "Ship Date: 12-JUN-2025");
 
-            document.add(headerTable);
-            document.add(new Paragraph(" "));
+        addCell(infoTable, "Delivery Gateway: NAGPUR-11");
+        addCell(infoTable, "Destination Pincode: 440005");
 
-            // ===== WAYBILL INFO TABLE =====
-            PdfPTable waybillTable = new PdfPTable(6);
-            waybillTable.setWidthPercentage(100);
-            waybillTable.setWidths(new float[]{20, 20, 20, 20, 20, 20});
+        document.add(infoTable);
+        document.add(new Paragraph(" "));
 
-            addCell(waybillTable, "Waybill No.", true);
-            addCell(waybillTable, "1000 1824 2559", false);
-            addCell(waybillTable, "Booking Branch", true);
-            addCell(waybillTable, "DELHI-15", false);
-            addCell(waybillTable, "Pickup Date", true);
-            addCell(waybillTable, "11-JUN-2025", false);
+        // ========= CONSIGNOR & CONSIGNEE =========
+        PdfPTable partyTable = new PdfPTable(2);
+        partyTable.setWidthPercentage(100);
+        partyTable.setWidths(new float[]{50, 50});
 
-            addCell(waybillTable, "Delivery Gateway", true);
-            addCell(waybillTable, "NAGPUR-11", false);
-            addCell(waybillTable, "Destination Pincode", true);
-            addCell(waybillTable, "440005", false);
-            addCell(waybillTable, "Ship Date", true);
-            addCell(waybillTable, "12-JUN-2025", false);
+        PdfPCell consignor = new PdfPCell();
+        consignor.addElement(new Paragraph("Consignor Name:\nJK FENNER(INDIA)LTD (NON VMI)(EX-W/H)"));
+        consignor.addElement(new Paragraph("Address:\nBuilding No. 176/8, Ground Floor, M.G Road, Sector 83, Delhi, 110045"));
+        consignor.setPadding(8);
+        partyTable.addCell(consignor);
 
-            document.add(waybillTable);
-            document.add(new Paragraph(" "));
+        PdfPCell consignee = new PdfPCell();
+        consignee.addElement(new Paragraph("Consignee Name:\nLOGITEC INFRO INDIA PVT. LTD"));
+        consignee.addElement(new Paragraph("Address:\nSadar Global Market, Gali No.8, Plot No.17, Sadar Metro Road, Sector 22, Bangalore, Karnataka - 560001"));
+        consignee.setPadding(8);
+        partyTable.addCell(consignee);
 
-            // Barcode
-            Barcode128 barcode = new Barcode128();
-            barcode.setCode("100018242559");
-            Image barcodeImg = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
-            barcodeImg.scalePercent(120);
-            document.add(barcodeImg);
-            document.add(new Paragraph(" "));
+        document.add(partyTable);
+        document.add(new Paragraph(" "));
 
-            // ===== CONSIGNOR =====
-            Font boldFont = new Font(Font.HELVETICA, 11, Font.BOLD);
-            document.add(new Paragraph("Consignor Name:", boldFont));
-            document.add(new Paragraph("JK FENNER (INDIA) LTD (NON VMI) (EX-W/H)"));
-            document.add(new Paragraph("Building No. 176/8, Ground Floor, M.G Road, Sector 83, Delhi, 110045"));
-            document.add(new Paragraph(" "));
+        // ========= PACKAGE DETAILS =========
+        PdfPTable pkgTable = new PdfPTable(4);
+        pkgTable.setWidthPercentage(100);
+        pkgTable.setWidths(new float[]{20, 20, 20, 40});
 
-            // ===== CONSIGNEE =====
-            document.add(new Paragraph("Consignee Name:", boldFont));
-            document.add(new Paragraph("LOGITEC INFRO INDIA PVT. LTD"));
-            document.add(new Paragraph("Sadar Global Market, Gali No.8, Plot No. 17, Sadar Metro Road, Sector 22, Bangalore, Karnataka - 560001"));
-            document.add(new Paragraph(" "));
+        addHeaderCell(pkgTable, "No. of Pkg");
+        addHeaderCell(pkgTable, "Weight (kg)");
+        addHeaderCell(pkgTable, "No. of Invoice");
+        addHeaderCell(pkgTable, "Invoice Value");
 
-            // ===== PACKAGE SUMMARY =====
-            PdfPTable summaryTable = new PdfPTable(4);
-            summaryTable.setWidthPercentage(100);
+        addCell(pkgTable, "10");
+        addCell(pkgTable, "250");
+        addCell(pkgTable, "2");
+        addCell(pkgTable, "₹16,00,000/-");
 
-            addHeader(summaryTable, "No. of Pkg");
-            addHeader(summaryTable, "Actual Weight (kg)");
-            addHeader(summaryTable, "No. of Invoice");
-            addHeader(summaryTable, "Invoice Value");
+        document.add(pkgTable);
+        document.add(new Paragraph(" "));
 
-            summaryTable.addCell("10");
-            summaryTable.addCell("250");
-            summaryTable.addCell("2");
-            summaryTable.addCell("₹16,00,000/-");
+        // ========= DIMENSIONS + INVOICES =========
+        PdfPTable dimTable = new PdfPTable(3);
+        dimTable.setWidthPercentage(100);
+        dimTable.setWidths(new float[]{40, 30, 30});
 
-            document.add(summaryTable);
-            document.add(new Paragraph(" "));
+        addHeaderCell(dimTable, "Dimensions (in)");
+        addHeaderCell(dimTable, "Invoice");
+        addHeaderCell(dimTable, "E-Waybill");
 
-            // ===== DETAILED TABLE (Dimensions, Invoice, E-Waybill) =====
-            PdfPTable detailTable = new PdfPTable(3);
-            detailTable.setWidthPercentage(100);
-            detailTable.setWidths(new float[]{30, 30, 40});
-
-            addHeader(detailTable, "Dimensions (in)");
-            addHeader(detailTable, "Invoice");
-            addHeader(detailTable, "E-Waybill");
-
-            // Rows (sample data from screenshot)
-            for (int i = 0; i < 4; i++) {
-                detailTable.addCell("12x12x14 (1), 12x12x14 (1), 12x12x14 (1)");
-                detailTable.addCell("0987654321, 0987654321, 0987654321");
-                detailTable.addCell("125473829999, 125473829999, 125473829999");
-            }
-
-            document.add(detailTable);
-            document.add(new Paragraph(" "));
-
-            // ===== FOOTER SECTION =====
-            PdfPTable footerTable = new PdfPTable(3);
-            footerTable.setWidthPercentage(100);
-            footerTable.setWidths(new float[]{33, 34, 33});
-
-            PdfPCell amtCell = new PdfPCell(new Phrase("Amount (₹): 2,50,000/-\nPDC Date: 30-OCT-24\nType: Draft\nFOR: CHAMINBHAI PATEL"));
-            footerTable.addCell(amtCell);
-
-            PdfPCell midCell = new PdfPCell(new Phrase("Marketing Material", boldFont));
-            midCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            footerTable.addCell(midCell);
-
-            PdfPCell fragileCell = new PdfPCell(new Phrase("Fragile material - Handle with care", new Font(Font.HELVETICA, 10, Font.ITALIC, Color.RED)));
-            fragileCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            footerTable.addCell(fragileCell);
-
-            document.add(footerTable);
-
-            // Credit Row
-            PdfPTable creditTable = new PdfPTable(2);
-            creditTable.setWidthPercentage(100);
-
-            PdfPCell credit = new PdfPCell(new Phrase("CREDIT", new Font(Font.HELVETICA, 12, Font.BOLD, Color.WHITE)));
-            credit.setBackgroundColor(Color.GREEN);
-            credit.setHorizontalAlignment(Element.ALIGN_CENTER);
-            creditTable.addCell(credit);
-
-            PdfPCell sfx = new PdfPCell(new Phrase("SFX0000558", new Font(Font.HELVETICA, 12, Font.BOLD)));
-            sfx.setHorizontalAlignment(Element.ALIGN_CENTER);
-            creditTable.addCell(sfx);
-
-            document.add(creditTable);
-
-            document.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i = 0; i < 4; i++) {
+            addCell(dimTable, "12x12x14 (1), 12x12x14 (1), 12x12x14 (1)");
+            addCell(dimTable, "0987654321, 0987654321");
+            addCell(dimTable, "125473829999, 125473829999");
         }
-        return new ByteArrayInputStream(out.toByteArray());
+
+        document.add(dimTable);
+        document.add(new Paragraph(" "));
+
+        // ========= AMOUNT & MATERIAL =========
+        PdfPTable amtTable = new PdfPTable(3);
+        amtTable.setWidthPercentage(100);
+        amtTable.setWidths(new float[]{33, 33, 34});
+
+        addCell(amtTable, "Amount (₹): 2,50,000/-\nPDC Date: 30-OCT-24\nType: Draft\nFOR: CHAMINBHAI PATEL");
+        addCell(amtTable, "Marketing Material");
+        addCell(amtTable, "Fragile material - Handle with care");
+
+        document.add(amtTable);
+        document.add(new Paragraph(" "));
+
+        // ========= CREDIT LINE =========
+        PdfPCell creditCell = new PdfPCell(new Phrase("CREDIT - SFX0000558", new Font(Font.HELVETICA, 12, Font.BOLD, Color.BLACK)));
+        creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        creditCell.setPadding(10);
+        creditCell.setBackgroundColor(Color.LIGHT_GRAY);
+
+        PdfPTable creditTable = new PdfPTable(1);
+        creditTable.setWidthPercentage(100);
+        creditTable.addCell(creditCell);
+        document.add(creditTable);
+        document.add(new Paragraph(" "));
+
+        // ========= BARCODE + AIRPLANE =========
+        PdfPTable barcodeTable = new PdfPTable(2);
+        barcodeTable.setWidthPercentage(100);
+        barcodeTable.setWidths(new float[]{80, 20});
+
+        // Barcode
+        Barcode128 barcode = new Barcode128();
+        barcode.setCode("100018242559");
+        Image barcodeImg = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
+        barcodeImg.scalePercent(120);
+
+        PdfPCell barcodeCell = new PdfPCell(barcodeImg, true);
+        barcodeCell.setBorder(Rectangle.NO_BORDER);
+        barcodeCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        barcodeTable.addCell(barcodeCell);
+
+        // Airplane icon
+        Image planeImg = Image.getInstance("src/main/resources/static/images/airplane.png");
+        planeImg.scaleAbsolute(50, 30);
+
+        PdfPCell planeCell = new PdfPCell(planeImg, true);
+        planeCell.setBorder(Rectangle.NO_BORDER);
+        planeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        barcodeTable.addCell(planeCell);
+
+        document.add(barcodeTable);
+
+        // ========= FOOTER =========
+        document.add(new Paragraph(" "));
+        Paragraph footer = new Paragraph("Contact: support@safexpress.com | +91-9999999999",
+                new Font(Font.HELVETICA, 10, Font.ITALIC, Color.GRAY));
+        footer.setAlignment(Element.ALIGN_CENTER);
+        document.add(footer);
+
+        document.close();
+        return baos.toByteArray();
     }
 
-    private void addCell(PdfPTable table, String text, boolean bold) {
-        Font font = bold ? new Font(Font.HELVETICA, 9, Font.BOLD) : new Font(Font.HELVETICA, 9);
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setPadding(5);
+    // ===== Helper methods =====
+    private void addCell(PdfPTable table, String text) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, new Font(Font.HELVETICA, 10)));
+        cell.setPadding(6);
         table.addCell(cell);
     }
 
-    private void addHeader(PdfPTable table, String text) {
-        Font font = new Font(Font.HELVETICA, 9, Font.BOLD, Color.WHITE);
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setBackgroundColor(Color.DARK_GRAY);
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        cell.setPadding(5);
+    private void addHeaderCell(PdfPTable table, String text) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, new Font(Font.HELVETICA, 11, Font.BOLD, Color.BLACK)));
+        cell.setBackgroundColor(Color.LIGHT_GRAY);
+        cell.setPadding(6);
         table.addCell(cell);
     }
 }
