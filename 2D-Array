@@ -1,9 +1,8 @@
 import com.lowagie.text.*;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.*;
 import org.springframework.stereotype.Service;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -11,60 +10,75 @@ import java.io.ByteArrayOutputStream;
 public class PdfService {
 
     public ByteArrayInputStream generateWaybillPdf() {
-        Document document = new Document(PageSize.A4);
+        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
-            PdfWriter.getInstance(document, out);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
             document.open();
 
-            // Title
-            Font titleFont = new Font(Font.HELVETICA, 16, Font.BOLD);
-            Paragraph title = new Paragraph("Digital Waybill", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
+            // ========== HEADER ==========
+            PdfPTable headerTable = new PdfPTable(2);
+            headerTable.setWidthPercentage(100);
+            headerTable.setWidths(new int[]{70, 30});
 
-            document.add(new Paragraph(" ")); // spacer
+            // SAFEXPRESS logo (placeholder text for now)
+            Font logoFont = new Font(Font.HELVETICA, 14, Font.BOLD, Color.BLACK);
+            PdfPCell logoCell = new PdfPCell(new Phrase("SAFEXPRESS\nDistribution Redefined", logoFont));
+            logoCell.setBorder(Rectangle.NO_BORDER);
+            logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            headerTable.addCell(logoCell);
 
-            // Waybill Info Table
-            PdfPTable table = new PdfPTable(2);
-            table.setWidthPercentage(100);
+            // Delivered stamp (green)
+            Font deliveredFont = new Font(Font.HELVETICA, 16, Font.BOLD, Color.GREEN);
+            PdfPCell deliveredCell = new PdfPCell(new Phrase("DELIVERED", deliveredFont));
+            deliveredCell.setBorder(Rectangle.NO_BORDER);
+            deliveredCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            headerTable.addCell(deliveredCell);
 
-            table.addCell(getCell("Waybill No:", PdfPCell.ALIGN_LEFT));
-            table.addCell("1000 1824 2559");
+            document.add(headerTable);
+            document.add(new Paragraph(" "));
 
-            table.addCell(getCell("Pickup Date:", PdfPCell.ALIGN_LEFT));
-            table.addCell("11-JUN-2025");
+            // ========== WAYBILL INFO ==========
+            PdfPTable infoTable = new PdfPTable(2);
+            infoTable.setWidthPercentage(100);
 
-            table.addCell(getCell("Ship Date:", PdfPCell.ALIGN_LEFT));
-            table.addCell("12-JUN-2025");
+            addInfoCell(infoTable, "Waybill No:", "1000 1824 2559");
+            addInfoCell(infoTable, "Booking Branch:", "DELHI-15");
+            addInfoCell(infoTable, "Pickup Date:", "11-JUN-2025");
+            addInfoCell(infoTable, "Delivery Gateway:", "NAGPUR-11");
+            addInfoCell(infoTable, "Destination Pincode:", "440005");
+            addInfoCell(infoTable, "Ship Date:", "12-JUN-2025");
 
-            table.addCell(getCell("Delivery Gateway:", PdfPCell.ALIGN_LEFT));
-            table.addCell("NAGPUR-11");
+            document.add(infoTable);
+            document.add(new Paragraph(" "));
 
-            table.addCell(getCell("Destination Pincode:", PdfPCell.ALIGN_LEFT));
-            table.addCell("440005");
-
-            document.add(table);
+            // Barcode for Waybill
+            Barcode128 barcode = new Barcode128();
+            barcode.setCode("100018242559");
+            Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
+            barcodeImage.scalePercent(100);
+            document.add(barcodeImage);
 
             document.add(new Paragraph(" "));
 
-            // Consignor Info
+            // ========== CONSIGNOR ==========
             Font sectionFont = new Font(Font.HELVETICA, 12, Font.BOLD);
-            document.add(new Paragraph("Consignor:", sectionFont));
+            document.add(new Paragraph("Consignor Name:", sectionFont));
             document.add(new Paragraph("JK FENNER (INDIA) LTD (NON VMI)"));
             document.add(new Paragraph("Building No. 176/8, Ground Floor, M.G Road, Sector 83, Delhi, 110045"));
             document.add(new Paragraph(" "));
 
-            // Consignee Info
-            document.add(new Paragraph("Consignee:", sectionFont));
+            // ========== CONSIGNEE ==========
+            document.add(new Paragraph("Consignee Name:", sectionFont));
             document.add(new Paragraph("LOGITEC INFRO INDIA PVT. LTD"));
             document.add(new Paragraph("Sadar Global Market, Gali No.8, Plot No. 17, Sadar Metro Road, Sector 22, Bangalore, Karnataka - 560001"));
             document.add(new Paragraph(" "));
 
-            // Package Info Table
+            // ========== PACKAGE INFO ==========
             PdfPTable pkgTable = new PdfPTable(4);
             pkgTable.setWidthPercentage(100);
+            pkgTable.setWidths(new int[]{25, 25, 25, 25});
 
             pkgTable.addCell("No. of Pkg");
             pkgTable.addCell("Actual Weight (kg)");
@@ -77,11 +91,13 @@ public class PdfService {
             pkgTable.addCell("₹16,00,000/-");
 
             document.add(pkgTable);
+            document.add(new Paragraph(" "));
 
-            document.add(new Paragraph("\nFragile material - Handle with care", new Font(Font.HELVETICA, 10, Font.ITALIC)));
+            // Fragile note
+            Font fragileFont = new Font(Font.HELVETICA, 11, Font.BOLDITALIC, Color.RED);
+            document.add(new Paragraph("Fragile material - Handle with care", fragileFont));
 
             document.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,12 +105,13 @@ public class PdfService {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private PdfPCell getCell(String text, int alignment) {
-        PdfPCell cell = new PdfPCell(new Phrase(text));
-        cell.setPadding(5);
-        cell.setHorizontalAlignment(alignment);
-        cell.setBorder(Rectangle.NO_BORDER);
-        return cell;
+    private void addInfoCell(PdfPTable table, String key, String value) {
+        PdfPCell cell1 = new PdfPCell(new Phrase(key));
+        PdfPCell cell2 = new PdfPCell(new Phrase(value));
+        cell1.setPadding(5);
+        cell2.setPadding(5);
+        table.addCell(cell1);
+        table.addCell(cell2);
     }
 }
 ====
@@ -114,7 +131,7 @@ public class PdfController {
     private PdfService pdfService;
 
     @GetMapping("/waybill/pdf")
-    public ResponseEntity<byte[]> downloadWaybillPdf() {
+    public ResponseEntity<byte[]> downloadPdf() throws Exception {
         ByteArrayInputStream bis = pdfService.generateWaybillPdf();
 
         return ResponseEntity.ok()
